@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Jade Delight</title>
+</head>
+
+<body>
+<script language="javascript">
+
+function MenuItem(name, cost)
+{
+	this.name = name;
+	this.cost=cost;
+}
+
+menuItems = new Array(
+	new MenuItem("Chicken Chop Suey", 4.5),
+	new MenuItem("Sweet and Sour Pork", 6.25),
+	new MenuItem("Shrimp Lo Mein", 5.25),
+	new MenuItem("Moo Shi Chicken", 6.5),
+	new MenuItem("Fried Rice", 2.35)
+);
+
+function makeSelect(name, minRange, maxRange)
+{
+	var t= "";
+	t = "<select name='" + name + "' size='1' onchange='fillIn(this)'>";
+	for (j=minRange; j<=maxRange; j++)
+	   t += "<option>" + j + "</option>";
+	t+= "</select>";
+	return t;
+}
+</script>
+
+<h1>Jade Delight</h1>
+<form>
+
+<p>First Name: <input type="text"  name='fname' /></p>
+<p>Last Name*:  <input type="text"  name='lname' /></p>
+<p>Street: <input type="text"  name='street' /></p>
+<p>City: <input type="text"  name='city' /></p>
+<p>Phone*: <input type="text"  name='phone' /></p>
+<p>
+	<input type="radio"  name="p_or_d" value = "pickup" checked="checked"/>Pickup
+	<input type="radio"  name='p_or_d' value = 'delivery'/>
+	Delivery
+</p>
+<table border="0" cellpadding="3">
+  <tr>
+    <th>Select Item</th>
+    <th>Item Name</th>
+    <th>Cost Each</th>
+    <th>Total Cost</th>
+  </tr>
+<script language="javascript">
+  var s = "";
+  for (i=0; i< menuItems.length; i++)
+  {
+	  s += "<tr><td>";
+	  s += makeSelect("quan" + i, 0, 10);
+	  s += "</td><td>" + menuItems[i].name + "</td>";
+	  s += "<td> $ " + menuItems[i].cost.toFixed(2) + "</td>";
+	  s += "<td>$<input type='text' name='cost'/></td></tr>";
+  }
+  document.writeln(s);
+
+function fillIn(sel) {
+    var diffAmount = sel.selectedIndex;
+    var costs = document.getElementsByName("cost");
+    switch(sel.name) {
+          case "quan0":
+            costs[0].value = (4.5 * diffAmount).toFixed(2);
+            break;
+          case "quan1":
+            costs[1].value = (6.25 * diffAmount).toFixed(2);
+            break;
+          case "quan2":
+            costs[2].value = (5.25 * diffAmount).toFixed(2);
+            break;
+          case "quan3":
+            costs[3].value = (6.5 * diffAmount).toFixed(2);
+            break;
+          default:
+            costs[4].value = (2.35 * diffAmount).toFixed(2);
+            break;
+    }
+
+    subtotal = 0;
+    tax = 0;
+    total = 0;
+    for (i = 0; i < 5; i++) {
+        num = 0;
+        if (costs[i].value) {
+            num = parseFloat(costs[i].value);
+        }
+        subtotal += num;
+    }
+    document.getElementById('subtotal').value = subtotal.toFixed(2);
+    tax = subtotal * 0.0625;
+    document.getElementById('tax').value = tax.toFixed(2);
+    total = tax + subtotal;
+    document.getElementById('total').value = total.toFixed(2);
+}
+
+function validate() {
+    with(document.forms[0]) {
+        var d = new Date();
+        m = 0;
+        if (p_or_d.value == "pickup") {
+            d.setMinutes(d.getMinutes() + 15);
+        } else {
+            d.setMinutes(d.getMinutes() + 30);
+        }
+
+        m = d.getMinutes();
+        h = d.getHours();
+        if (d.getHours() > 12) { h = h - 12; }
+
+        valid = true;
+        if (lname.value == "") valid = false;
+        if (phone.value == "") valid = false;
+        var pattern = /^\(?([0-9]{3})\)?[-]?([0-9]{3})[-]?([0-9]{4})$/;
+        if (!phone.value.match(pattern)) valid = false;
+        if ((p_or_d.value == "delivery") &&
+            (street.value == "")) valid = false;
+        if ((p_or_d.value == "delivery") &&
+            (city.value == "")) valid = false;
+
+        min = "";
+        if (m < 10) {
+            min = "0" + m;
+        } else {
+            min = m;
+        }
+
+        ho = "";
+        if (h == 0) {
+            ho = "12";
+        } else {
+            ho = h;
+        }
+
+        if (document.getElementById("total").value == "") total.value = 0;
+
+        successfulOrder = "We have recieved your order! Your order will be "
+        successfulOrder += "ready at " + ho + ":" + min + ". Your total is "
+        successfulOrder += "$" + total.value + ".\n\nWe hope your meal is "
+        successfulOrder += "Jade Delight-ful!"
+
+        error = "There is some important information you have forgotten to "
+        error += "fill out in the form!\n\nMake sure you have written in "
+        error += "your last name, a phone number in xxx-xxx-xxxx format, and,"
+        error += " if you are getting delivery, your address and city."
+        if (valid == false) {
+            alert(error);
+        } else {
+            alert(successfulOrder);
+        }
+    }
+}
+</script>
+</table>
+<p>Subtotal:
+   $<input type="text"  name='subtotal' id="subtotal" />
+</p>
+<p>Mass tax 6.25%:
+  $ <input type="text"  name='tax' id="tax" />
+</p>
+<p>Total: $ <input type="text"  name='total' id="total" />
+</p>
+
+<input type = "submit" value = "Submit Order" onclick="validate()"/>
+
+</form>
+</body>
+</html>
